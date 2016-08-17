@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -Werror -ansi -pedantic 
+CFLAGS = -Wall -Werror -ansi -pedantic -Qunused-arguments 
 DIRECT = bin
 SRCS = src/
 SRC := $(wildcard src/*.cpp) #list of source files

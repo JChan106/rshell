@@ -11,7 +11,7 @@ class Parse {
 
     private:
         Shell* shell;
-        ConnectBase* connectbase;
+        //ConnectBase* connectbase;
         void pop_front(vector<string>&);
 
     public:
