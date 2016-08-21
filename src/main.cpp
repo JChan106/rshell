@@ -13,9 +13,8 @@
 #include <sys/wait.h>
 #include <sys/stat.h> 
 #include "Shell.h"
-#include "ConnectBase.h"
-#include "Parse.h"
 #include "Forker.h"
+#include "Parse.h"
 
 using namespace std;
 

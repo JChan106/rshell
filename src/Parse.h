@@ -3,7 +3,6 @@
 #include <iostream>
 #include <string>
 #include "Shell.h"
-#include "ConnectBase.h"
 
 using namespace std;
 
