@@ -1,9 +1,8 @@
-Script started on Tue Aug 16 23:54:59 2016
-[?1034hbash-3.2$ ./bin/rshell
-kurtluu12@Kurtesy.local$ #commented command
-kurtluu12@Kurtesy.local$ # # is w     works
+Script started on Sat Aug 20 20:08:17 2016
+[?1034hbash-3.2$ ./nb[K[Kbin/rshell
+kurtluu12@Kurtesy.local$ ls#comment
 kurtluu12@Kurtesy.local$ exit
 bash-3.2$ exit
 exit
 
-Script done on Tue Aug 16 23:55:27 2016
+Script done on Sat Aug 20 20:08:33 2016
