@@ -6,7 +6,6 @@ class Forker : public Shell {
 	public:
 		Forker() {}
 		void execute(bool &, vector<string> &);
-		void eggsit(vector<string>);
 };
 
 #endif

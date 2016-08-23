@@ -10,12 +10,15 @@ class Parse {
 
     private:
         Shell* shell;
-        //ConnectBase* connectbase;
         void pop_front(vector<string>&);
+        bool bracket_finder(vector<string>); 
+        void bracket_deleter(vector<string> &);
+        void checkFlag(vector<string> &);
 
     public:
         Parse() {}
         void par(string);
+        
 };
 
 #endif 
