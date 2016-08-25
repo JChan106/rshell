@@ -12,3 +12,4 @@ class Tester : public Forker {
 };
 
 #endif
+
