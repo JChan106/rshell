@@ -13,14 +13,18 @@
 
 using namespace std;
 
+Forker::Forker(vector<string> &cmdLine) {
+    id = "cmd";
+    cmd = cmdLine;
+}
 // executes commands using execvp
-void Forker::execute(bool &last_cmd, vector<string> &cmdLine) {
+bool Forker::execute() {
 
 	//Changes cmdLine into a cstring array.
 	vector<char*> argv;
-	argv.resize(cmdLine.size() + 1);
-	for (size_t i = 0; i != cmdLine.size(); ++i) {
-		argv[i] = &cmdLine[i][0];
+	argv.resize(cmd.size() + 1);
+	for (size_t i = 0; i != cmd.size(); ++i) {
+		argv[i] = &cmd[i][0];
 	}
 
 	//Fork() and uses execvp(). The parent waits for the child to finish doing work.
@@ -44,10 +48,11 @@ void Forker::execute(bool &last_cmd, vector<string> &cmdLine) {
         waitpid(pid, &status, 0);
 
         if (WEXITSTATUS(status) == 0) {
-            last_cmd = true;
+            return true;
         }
         else if (WEXITSTATUS(status) == 1) {
-            last_cmd = false;
+            return false;
         }
     }
+    return true;
 }

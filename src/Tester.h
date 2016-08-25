@@ -1,12 +1,14 @@
 #ifndef __TESTER_H__
 #define __TESTER_H__
-#include "Shell.h"
+#include "Forker.h"
 
-class Tester : public Shell {
+class Tester : public Forker {
 	public:
 		Tester() {}
-		void execute(bool &, vector<string> &);
+		Tester(vector<string> &v) : Forker(v) {
+			id = "test";
+		}
+		bool execute();
 };
 
 #endif
-

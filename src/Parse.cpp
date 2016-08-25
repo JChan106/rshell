@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
+#include <stack>
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
@@ -22,98 +23,97 @@ void Parse::pop_front(vector<string> &v) {
     assert(!v.empty());
     v.erase(v.begin());
 }
+void Parse::pop_front(vector<Shell*> &v) {
+    assert(!v.empty());
+    v.erase(v.begin());
+}
 
 //returns true if both '[' and ']' are found 
-bool Parse::bracket_finder(vector<string> str_vector) {
-    if (str_vector.at(0) == "[") {
-        if (str_vector.at(str_vector.size() - 1) == "]") {
-            return true;
+bool Parse::bracket_finder(vector<string> str_vector, unsigned i) {
+    if (str_vector.at(i) == "[") {
+        for (unsigned j = i + 2; j < str_vector.size(); ++j) {
+            if (str_vector.at(j) == "]") {
+                return true;
+            }
         }
-        else {
-            perror("Error: Cannot find ']'\n" );
-        }
+        perror("Error: Cannot find ']'\n" );
     }
     return false;
 }
 
-//deletes brackets 
-void Parse::bracket_deleter(vector<string> &str_vector) {
-    pop_front(str_vector);
-    str_vector.pop_back();
+
+void Parse::createTester(vector<string> &cmds_vector,unsigned i, unsigned j) {
+    vector<string> cmd;
+    for (unsigned k = i; k < j; ++k) {
+        cmd.push_back(cmds_vector.at(k));
+    }
+    exec_cmds_vector.push_back(new Tester(cmd));
+}
+// //deletes brackets 
+// void Parse::bracket_deleter(vector<string> &str_vector) {
+//     pop_front(str_vector);
+//     str_vector.pop_back();
+// }
+
+void Parse::createTree(stack<Connector*> &cmd_stack) {
+    if (!cmd_stack.empty() && (cmd_stack.top()->getID() == "conn")) {
+        //setRightChild
+        cmd_stack.top()->setRightChild(exec_cmds_vector.back());
+        exec_cmds_vector.pop_back();
+        //setLeftChild
+        cmd_stack.top()->setLeftChild(exec_cmds_vector.back());
+        exec_cmds_vector.pop_back();
+        //pop from stack & push onto exec_cmds_vector
+        exec_cmds_vector.push_back(cmd_stack.top());
+        cmd_stack.pop();
+    }
 }
 
-// void Parse::checkFlag(vector<string> &v) {
-//     //check exist
-//     //3rd argument means that first char in string is not a flag; no flag, nor invalid flag specified, check exist
-//     if (v.at(0) == "-e" || v.at(0) == "-" || (v.at(0)).at(0) != '-') {
-//         //poppin bottles so v.at(0) == filename
-//         if(v.at(0) == "-e" || v.at(0) == "-") { 
-//             pop_front(v); 
-//         }
-//         //convert v.at(0) to charray for stat()
-//         string str = v.at(0);
-//         char f[1024];
-//         strcpy(f, str.c_str());  
-        
-//         //return True if exist
-//         struct stat exist;
-//         if (stat(f, &exist) == 0) {
-//             cout << "True\n";
-//         }
-//         else {
-//             cout << "False\n";
-//         }
-//     }
-//     //check file
-//     else if(v.at(0) == "-f") {
-//         pop_front(v);
-        
-//         string str = v.at(0);
-//         char f[1024];
-//         strcpy(f, str.c_str());  
-        
-//         struct stat file; 
-        
-//         if (stat(f, &file) == 0 && S_ISREG(file.st_mode)) {
-//             cout << "(True)\nPath Exists\n";
-//         }
-//         else {
-//             cout << "(False)\n";
-//         }
-//     }
-//     //check directory
-//     else if(v.at(0) == "-d") {
-//         pop_front(v);
-        
-//         string str = v.at(0);
-//         char f[1024];
-//         strcpy(f, str.c_str());  
-        
-//         struct stat file; 
-//         //stat(f, &file);
-//         //TODO: once false, could be true or false, once true, everything else will be true, 
-//         if (stat(f, &file) == 0 && S_ISDIR(file.st_mode)) {
-//             cout << "True\n";
-//         }
-//         else {
-//             cout << "False\n";
-//         }
-//         return;
-//     }
-//     //else invalid flag
-//     else {
-//         perror("Error: Invalid flag.\n");
-//     }
-// } 
+void Parse::createFork(vector<string> &cmds_vector, unsigned i, unsigned j) {
+    vector<string> cmd;
+    for (unsigned k = i; k < j; ++k) {
+        if (cmds_vector.at(k) != "\"") {
+            cmd.push_back(cmds_vector.at(k));
+        }
+    }
+    exec_cmds_vector.push_back(new Forker(cmd));
+}
+
 
 void Parse::par(string in) {
     const string a = "&&";
     const string o = "||";
     const string s = ";";
-    bool previous = true;
+    const string lp = "(";
+    const string rp = ")";
     
-    // remove quotations in the string for the echo command
-    in.erase(remove( in.begin(), in.end(), '\"'), in.end());
+    //allow for parsing open/close parenthesis using strtok()
+    bool validP = true;
+    for (unsigned i = 0; i < in.size(); ++i) {
+        //checks to see if quotes exist. If exist, will ignore parenthesis
+        //within the quotes 
+        //Note: won't take care of special characters
+        if (in.at(i) == '\"') {
+            validP = !validP; //toggle validP
+            in.erase(in.begin() + i); //delete the quote
+        }
+        
+        if (validP) {
+           if (i < in.size()) {
+                if (in.at(i) == '(') { //if open paren, insert space after
+                    in.insert(i + 1, " ");
+                }
+                else if (in.at(i) == ')') { //if close paren, insert space before
+                    in.insert(i, " ");
+                    ++i;
+                }
+                else if (in.at(i) == ';') {
+                    in.insert(i, " ");
+                    ++i;
+                }
+           }
+        }
+    }
     
     // parse command line and store in cmds_vector 
     char cmds[1024];
@@ -125,87 +125,161 @@ void Parse::par(string in) {
     // parse white space
     ptr = strtok(cmds, " "); 
     // store parsed commands into cmds_vector
-    while(ptr != NULL) {
+    while (ptr != NULL) {
         cmds_vector.push_back(ptr);
         ptr = strtok(NULL, " ");
     }
     // push elements from cmds_vector to exec_cmds_vector until hitting a connector
     // then execute everything before connector and clear
     // check for connector and execute next command depending on connector and if the last command pass/failed
-    while(!cmds_vector.empty()) {
-        // comment case
-        if ((cmds_vector.at(0))[0] == '#') {
-            cmds_vector.clear();
+    
+    
+    stack<Connector*> cmd_stack; 
+    
+    // comment case
+    for (unsigned j = 0; j < cmds_vector.size(); ++j) {
+        if ((cmds_vector.at(j))[0] == '#') {
+            cmds_vector.resize(j);
             break;
         }
-        // vector of commands which will be executed
-        vector<string> exec_cmds_vector;
-        for (unsigned i = 0; i < cmds_vector.size();) {
-            // Transferring Commands
-            if (cmds_vector.at(i) != a && 
-                cmds_vector.at(i) != o &&
-                cmds_vector.at(i) != s) {
-                    exec_cmds_vector.push_back(cmds_vector.at(i));
-                    pop_front(cmds_vector);
-            }
-            // Stops transferring to exec_cmds_vector if connector is hit
-            else {
-                break;
-            }
-        }
-        // execute command
-        if (!exec_cmds_vector.empty()) {
-            // Exits if user types in exit
-            if (exec_cmds_vector.at(0) == "exit") {
-                exit(0);
-            }
-            else if (exec_cmds_vector.at(0) == "test" || bracket_finder(exec_cmds_vector)) {
-                // Delete the word test
-                if (exec_cmds_vector.at(0) == "test") {
-                    pop_front(exec_cmds_vector);
-                }
-                // Deletes square brackets
-                else {
-                    bracket_deleter(exec_cmds_vector);
-                }
-                // Breaks if no arguments after test
-                if (exec_cmds_vector.empty()) {
-                    break;
-                }
-                // checkFlag(exec_cmds_vector);
-                
-                // Using test command
-                shell = new Tester();
-                shell->execute(previous, exec_cmds_vector);
-            }
-            else {
-                // Using execvp
-                shell = new Forker();
-                shell->execute(previous, exec_cmds_vector);
-            }
-            exec_cmds_vector.clear();
-        }
-        // Nothing happens if no commands
-        else {
-            break;
-        }
+    }
+    
+    if (cmds_vector.at(0) == "exit") {
+        exit(0);
+    }
+    
+    unsigned i;
+    for (i = 0; i < cmds_vector.size();++i) {
+        // Transferring Commands
+        string indexString = cmds_vector.at(i);
         
-        if (!cmds_vector.empty()) {
-            // && case
-            if (cmds_vector.at(0) == a && previous == true) {
-                pop_front(cmds_vector);
-            } 
-            // || case
-            else if (cmds_vector.at(0) == o && previous == false) {
-                pop_front(cmds_vector);
+        
+        //connectors & commands
+        if (cmds_vector.at(i) == a) {
+            //check to see if exist a conn
+            createTree(cmd_stack);
+            //push new operator onto stack
+            cmd_stack.push(new And());
+        }
+        else if (cmds_vector.at(i) == o) {
+            //check to see if exist a conn
+            createTree(cmd_stack);
+            //push new operator onto stack
+            cmd_stack.push(new Or());
+        }
+        else if (cmds_vector.at(i) == s) {
+            //check to see if exist a conn
+            createTree(cmd_stack);
+            //push new operator onto stack
+            cmd_stack.push(new SemiColon());
+        }
+        else if (cmds_vector.at(i) == rp) {
+            //keep create trees until find open parenthesis
+            while (cmd_stack.top()->getID() != lp) {
+                createTree(cmd_stack);
             }
-            // ; case
-            else if (cmds_vector.at(0) == s) {
-                pop_front(cmds_vector);
+            //pop the open parenthesis from cmd_stack
+            cmd_stack.pop();
+        }
+        else if (cmds_vector.at(i) == lp) {
+            cmd_stack.push(new Parenthesis());
+        }
+        else if (cmds_vector.at(i) == "test" || 
+                bracket_finder(cmds_vector, i)) {
+                    // // Delete the word test
+                    // if (cmds_vector.at(i) == "test") {
+                    //     pop_front(exec_cmds_vector);//-----TODO
+                    // }
+                    // // Deletes square brackets
+                    // else {
+                    //     bracket_deleter(cmds_vector,i);//-----TODO
+                    // }
+                    // Breaks if no arguments after test
+                    if ((i + 1) == cmds_vector.size()) {
+                        break;
+                    }
+                    // checkFlag(exec_cmds_vector);
+                    if (cmds_vector.at(i) == "test") {
+                        
+                        unsigned size = cmds_vector.size();
+                        
+                        if ((i + 1) == size ||
+                            cmds_vector.at(i) == a ||
+                            cmds_vector.at(i) == o ||
+                            cmds_vector.at(i) == s ||
+                            cmds_vector.at(i) == lp) {
+                                perror("No statement after test\n");
+                            }
+                        if ((i + 2) == size ||
+                            (i + 3) == size) {
+                                createTester(cmds_vector, i + 1, size);
+                                if ((i + 2) == size) {
+                                    ++i;
+                                }
+                                else {
+                                    i += 2;
+                                }
+                        }
+                        else if (cmds_vector.at(i + 2) == a || 
+                            cmds_vector.at(i + 2) == o ||
+                            cmds_vector.at(i + 2) == s ) {
+                                //create Tester() with default flag
+                                createTester(cmds_vector, i + 1, i + 2);
+                                ++i; //to push conn
+                        }
+                        else if (cmds_vector.at(i + 3) == a || 
+                                cmds_vector.at(i + 3) == o ||
+                                cmds_vector.at(i + 3) == s ) {
+                                    //create Tester with flag
+                                    createTester(cmds_vector, i + 1, i + 3);
+                                    i += 2; //to push conn
+                                }
+                    }
+                    else if (cmds_vector.at(i) == "[") {
+                        if (cmds_vector.at(i + 2) == "]") {
+                            //create Tester() with default flag
+                            createTester(cmds_vector, i + 1, i + 2);
+                            i += 2; //skip  "]"
+                        }
+                        else if (cmds_vector.at(i + 3) == "]") {
+                            //create Tester with flag
+                            createTester(cmds_vector, i + 1, i + 3);
+                            i += 3; //skip "]"
+                        }
+                        else {
+                            perror("Invalid #of statements or no ']' found\n");
+                        }
+                    }
+        }
+        else {//is part of the bash cmds
+            //iterate until find a conn
+            unsigned j;
+            for (j = i; j < cmds_vector.size(); ++j) {
+                //if conn found
+                if (cmds_vector.at(j) == a || 
+                    cmds_vector.at(j) == o ||
+                    cmds_vector.at(j) == s ||
+                    cmds_vector.at(j) == rp) {
+                        //store strings into new Fork
+                        createFork(cmds_vector, i, j);
+                        i = j - 1; //need to add the conn
+                        break;
+                }
             }
-            else {
+            //if no conn found, means end of cmd_vector
+            if (j >=  cmds_vector.size()) {
+                //create new Fork
+                createFork(cmds_vector, i, j);
                 break;
             }
         }
+    }
+    
+    while (!cmd_stack.empty()) {
+        createTree(cmd_stack);
+    }
+    
+    if (!exec_cmds_vector.empty() && exec_cmds_vector.at(0)->execute()) {
+        exec_cmds_vector.clear();
     }
 }

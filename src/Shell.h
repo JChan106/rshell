@@ -10,9 +10,12 @@ using namespace std;
 
 // Base Class
 class Shell {
+	protected:
+		string id;
 	public:
 		Shell() {}
-		virtual void execute(bool &, vector<string> &) = 0;
+		string getID() { return id; };
+		virtual bool execute() = 0;
 };
 
 #endif

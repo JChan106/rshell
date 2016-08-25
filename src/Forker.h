@@ -3,9 +3,12 @@
 #include "Shell.h"
 
 class Forker : public Shell {
+	protected:
+		vector<string> cmd;
 	public:
 		Forker() {}
-		void execute(bool &, vector<string> &);
+		Forker(vector<string> &);
+		bool execute();
 };
 
 #endif

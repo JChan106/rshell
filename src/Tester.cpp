@@ -18,18 +18,22 @@
 
 using namespace std;
 
-void Tester::execute(bool &last_cmd, vector<string> &cmdLine) {
+bool Tester::execute() {
     bool check = false;
     // Checks if the test has arguments
-    if (cmdLine.at(0) == "-e" || cmdLine.at(0) == "-f" || cmdLine.at(0) == "-d") {
+    if(cmd.size() == 1 && cmd.at(0).at(0) != '-') {
+        cmd.insert(cmd.begin(), "-e");
+    }
+        
+    if (cmd.at(0) == "-e" || cmd.at(0) == "-f" || cmd.at(0) == "-d") {
         // Puts the file name into a character array
-        string filename = cmdLine.at(1);
+        string filename = cmd.at(1);
         char f[1024];
         strcpy(f, filename.c_str());
         
         struct stat exist;
         
-        if (cmdLine.at(0) == "-e") {
+        if (cmd.at(0) == "-e") {
             if (stat(f, &exist) == 0) {
                 cout << "(True)\npath exists\n";
                 check = true;
@@ -38,7 +42,7 @@ void Tester::execute(bool &last_cmd, vector<string> &cmdLine) {
                 cout << "(False)\n";
             }
         }
-        else if (cmdLine.at(0) == "-f") {
+        else if (cmd.at(0) == "-f") {
             if (stat(f, &exist) == 0 && S_ISREG(exist.st_mode)) {
                 cout << "(True)\npath exists\n";
                 check = true;
@@ -57,10 +61,9 @@ void Tester::execute(bool &last_cmd, vector<string> &cmdLine) {
             }
         }
     }
-    // Error if invalid argument
     else {
+        // Error if invalid argument
         perror("Error: Invalid flag.\n");
     }
-    last_cmd = check;
+    return check;
 }
-

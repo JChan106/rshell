@@ -19,10 +19,10 @@
 using namespace std;
 
 int main() {
-	Parse* p = new Parse();
 	string line;	
 	string arg = "";
 	while(true) {
+		Parse* p = new Parse();
 		char user[1024];
 		//Gets username, outputs an error if it is unable to
 		if (getlogin_r(user, sizeof(user) - 1) != 0) {
@@ -38,7 +38,8 @@ int main() {
 		//Gets a command
 		getline(cin, line);  
 		// parses and runs code
-		p->par(line); 
+		p->par(line);
+		delete p;
 	}
 	return 0;
 }
