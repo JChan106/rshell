@@ -2,7 +2,9 @@ name1=Jackie Chan
 ucrnetid1=jchan106
 name2=Kurt Luu
 ucrnetid2=kluu007
-repourl=https://www.github.com/busrac/rshell.git
+name3=Anthony Mai
+ucrnetid3=amai014
+repourl=https://www.github.com/jchan106/rshell.git
 
 Notes about rshell:
 - Everything Works correctly

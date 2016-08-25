@@ -11,7 +11,7 @@ using namespace std;
 class Parse {
 
     private:
-        Shell* shell;
+        // Shell* shell;
         void pop_front(vector<string>&);
         void pop_front(vector<Shell*>&);
         
@@ -31,3 +31,4 @@ class Parse {
 };
 
 #endif 
+

@@ -52,3 +52,4 @@ bool SemiColon::execute() {
 bool Parenthesis::execute() {
     return true;
 }
+
