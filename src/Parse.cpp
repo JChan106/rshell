@@ -95,7 +95,7 @@ void Parse::par(string in) {
         //Note: won't take care of special characters
         if (in.at(i) == '\"') {
             validP = !validP; //toggle validP
-            in.erase(in.begin() + i); //delete the quote
+            //in.erase(in.begin() + i); //delete the quote
         }
         
         if (validP) {
@@ -144,9 +144,9 @@ void Parse::par(string in) {
         }
     }
     
-    if (cmds_vector.at(0) == "exit") {
-        exit(0);
-    }
+    // if (cmds_vector.at(0) == "exit") {
+    //     exit(0);
+    // }
     
     unsigned i;
     for (i = 0; i < cmds_vector.size();++i) {
@@ -253,7 +253,7 @@ void Parse::par(string in) {
         }
         else {//is part of the bash cmds
             //iterate until find a conn
-            unsigned j;
+            unsigned j = 0;
             for (j = i; j < cmds_vector.size(); ++j) {
                 //if conn found
                 if (cmds_vector.at(j) == a || 
