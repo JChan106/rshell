@@ -19,7 +19,9 @@ Forker::Forker(vector<string> &cmdLine) {
 }
 // executes commands using execvp
 bool Forker::execute() {
-
+    if (cmd.size() == 1 && cmd.at(0) == "exit") {
+        exit(0);
+    }
 	//Changes cmdLine into a cstring array.
 	vector<char*> argv;
 	argv.resize(cmd.size() + 1);
