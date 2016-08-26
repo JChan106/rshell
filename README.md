@@ -3,7 +3,7 @@ ucrnetid1=jchan106
 name2=Kurt Luu
 ucrnetid2=kluu007
 name3=Anthony Mai
-ucrnetid3=amai014
+ucrnetid3=amai005
 repourl=https://www.github.com/jchan106/rshell.git
 
 Notes about rshell:
